@@ -1,34 +1,19 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useStore } from "./Zustand";
 import {
-  Search,
-  Bell,
-  LogOut,
-  LogIn,
-  UserPlus,
-  Home,
-  Store,
+  Search, Bell, LogOut, LogIn, UserPlus, Home, Store
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { UnverifiedIcon } from "@primer/octicons-react";
 import { FaPeopleGroup } from "react-icons/fa6";
 import axios from "axios";
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
+  useQuery, useMutation, useQueryClient
 } from "@tanstack/react-query";
 
 function Header() {
   const navigate = useNavigate();
-  const isLoggedIn = useStore((state) => state.isLoggedIn);
-  const username = useStore((state) => state.username);
-  const logout = useStore((state) => state.logout);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const { isLoggedIn, username, logout, role, triggerRefetchNoti, setTriggerRefetchNoti } = useStore();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNoti, setShowNoti] = useState(false);
@@ -49,9 +34,16 @@ function Header() {
   const markAsRead = (id) => API.put(`/notification/read/${id}`);
   const markAllAsRead = () => API.put("/notification/read-all");
 
-  const { data: notiData, isLoading: notiLoading } = useQuery({
+  const {
+    data: notiData,
+    isLoading: notiLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["notifications"],
     queryFn: getMyNotifications,
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const readOneMutation = useMutation({
@@ -68,6 +60,10 @@ function Header() {
 
   const handleRead = (id) => readOneMutation.mutate(id);
   const handleReadAll = () => readAllMutation.mutate();
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -79,14 +75,20 @@ function Header() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-const notifications =
-  Array.isArray(notiData?.data?.data) ? notiData.data.data : [];
-  console.log("notiData", notiData);
+  useEffect(() => {
+    if (triggerRefetchNoti) {
+      refetch();
+      setTriggerRefetchNoti(false);
+    }
+  }, [triggerRefetchNoti, refetch, setTriggerRefetchNoti]);
+
+const raw = notiData?.data?.data?.data;
+  const notifications = Array.isArray(raw)
+    ? [...raw].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    : [];
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -124,7 +126,6 @@ const notifications =
                 👋 <strong>{username}</strong>
               </span>
 
-              {/* Notification Bell */}
               <div className="relative" ref={notiRef}>
                 <Bell
                   onClick={() => setShowNoti((prev) => !prev)}
@@ -151,9 +152,9 @@ const notifications =
                           <li
                             key={noti.id}
                             onClick={() => handleRead(noti.id)}
-                            className={`px-4 py-2 cursor-pointer ${
-                              noti.isRead ? "text-gray-500" : "font-semibold"
-                            } hover:bg-gray-100`}
+                            className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                              noti.isRead ? "text-gray-500" : "font-semibold text-black"
+                            }`}
                           >
                             <div>{noti.title}</div>
                             <div className="text-sm">{noti.content}</div>
@@ -165,7 +166,6 @@ const notifications =
                 )}
               </div>
 
-              {/* User Avatar Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <div
                   onClick={() => setShowDropdown((prev) => !prev)}
@@ -182,6 +182,14 @@ const notifications =
                           👤 <strong>{username}</strong>
                         </li>
                       </NavLink>
+
+                      {role === "admin" && (
+                        <NavLink to="/admin">
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600">
+                            🛠️ Trang Admin
+                          </li>
+                        </NavLink>
+                      )}
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         ⚙️ Cài đặt tài khoản
                       </li>
@@ -194,7 +202,6 @@ const notifications =
                         </li>
                       </NavLink>
                     </ul>
-
                     <div
                       onClick={handleLogout}
                       className="flex items-center gap-1 text-black px-3 py-1 rounded hover:bg-gray-400"
@@ -207,16 +214,10 @@ const notifications =
             </>
           ) : (
             <>
-              <NavLink
-                to="/login"
-                className="flex items-center gap-1 text-blue-600 hover:underline"
-              >
+              <NavLink to="/login" className="flex items-center gap-1 text-blue-600 hover:underline">
                 <LogIn size={16} /> Login
               </NavLink>
-              <NavLink
-                to="/signup"
-                className="flex items-center gap-1 text-blue-600 hover:underline"
-              >
+              <NavLink to="/signup" className="flex items-center gap-1 text-blue-600 hover:underline">
                 <UserPlus size={16} /> Sign Up
               </NavLink>
             </>

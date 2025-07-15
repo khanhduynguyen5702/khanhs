@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import UserIn4 from "./pages/UserIn4";
@@ -11,25 +10,35 @@ import Store from "./pages/Store";
 import Memories from "./pages/Memories";
 import ForgetPass from "./pages/ForgetPass";
 import ChangePass from "./pages/ChangePass";
+import AdminPage from "./pages/AdminPage";
+import AuthLayout from "./layout/AuthLayout";
+import AuthApp from "./layout/AuthApp";
 
 function App() {
   const jwt = localStorage.getItem("jwt")
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
+
+      <Route element={<AuthApp/>}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgetpass" element= {<ForgetPass/>}/>
+      </Route>
+
+      <Route element={<AuthLayout/>}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/userin4" element={<UserIn4 />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUpPage />} />
           <Route path="/groups" element={<Groups/>}/>
           <Route path="/store" element ={<Store/>}/>
           <Route path="/friends" element ={<Friends/>}/>
           <Route path="/memories" element ={<Memories/>}/>
-          <Route path="/forgetpass" element= {<ForgetPass/>}/>
           <Route path="/changepass" element ={<ChangePass/>} />
-        </Route>
+          <Route path="/admin" element = {<AdminPage/>}/>
+      </Route>
+
+          <Route paht="*" element={<Login/>} />
       </Routes>
     </BrowserRouter>
   );

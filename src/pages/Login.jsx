@@ -25,14 +25,23 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await axios.post('https://haicode.fcstoys.cloud/api/users/login', {
+      const res = await axios.post("https://haicode.fcstoys.cloud/api/users/login", {
         username: userName,
         password: passWord,
       });
 
       const jwt = res.data?.data?.jwt;
+
       if (jwt) {
-        login(jwt, userName);
+        const meRes = await axios.get("https://haicode.fcstoys.cloud/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        const fetchedRole = meRes.data?.data?.user?.role || meRes.data?.data?.role || "user";
+
+        login(jwt, userName, fetchedRole);
         toast.success("Đăng nhập thành công!");
         navigate("/");
       } else {
@@ -60,7 +69,7 @@ function Login() {
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="text"
-            placeholder="username..."
+            placeholder="Username..."
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -87,23 +96,27 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className={`bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+            className={`bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition ${
+              loading ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           >
             {loading ? "Đang đăng nhập..." : "Login"}
           </button>
 
           <p className="mt-4 text-center text-sm text-gray-600">
             Forgot password?{" "}
-            <a href="/forgetpass" className="text-indigo-600 hover:underline">Forgot</a>
+            <a href="/forgetpass" className="text-indigo-600 hover:underline">
+              Forgot
+            </a>
           </p>
 
           <p className="mt-4 text-center text-sm text-gray-600">
-            Don't have account?{" "}
-            <a href="/signup" className="text-indigo-600 hover:underline">SignUp</a>
+            Don't have an account?{" "}
+            <a href="/signup" className="text-indigo-600 hover:underline">
+              Sign Up
+            </a>
           </p>
-
         </form>
-
       </div>
     </div>
   );
