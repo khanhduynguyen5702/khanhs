@@ -36,6 +36,7 @@ const Home = () => {
     if (!isLoggedIn) navigate('/login', { replace: true });
   }, [isLoggedIn, navigate]);
 
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (formRef.current && !formRef.current.contains(e.target)) {
