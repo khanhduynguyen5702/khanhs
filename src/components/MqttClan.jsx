@@ -78,7 +78,6 @@ const MQTTComponents = ({ onMessageCallback }) => {
       console.log('👋 Đã ngắt kết nối MQTT');
     };
   }, [userId, onMessageCallback]);
-
   return null; // Không hiển thị UI
 };
 
