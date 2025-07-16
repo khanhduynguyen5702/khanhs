@@ -24,7 +24,7 @@ const Home = () => {
   const [commentPosts, setCommentPosts] = useState(() => {
     const stored = localStorage.getItem('commentPosts');
     return stored ? JSON.parse(stored) : {};
-  });
+  });   
 
   const [replyCmt, setReplyCmt] = useState(() => {
     const stored = localStorage.getItem('replyCmt');
@@ -337,7 +337,7 @@ const Home = () => {
           <div key={post.id} className="bg-white rounded-xl shadow p-4">
             <NavLink to="/userin4" className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-lg transition">
               <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
-                {post.user?.username?.charAt(0).toUpperCase() || 'U'}
+                {post.user?.username?.charAt(0).toUpperCase() || 'U1111'}
               </div>
               <div className="text-gray-800 font-semibold">{post.user?.username || 'Ẩn danh'}</div>
             </NavLink>
