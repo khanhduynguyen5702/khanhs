@@ -11,7 +11,7 @@ import {
   useQuery, useMutation, useQueryClient
 } from "@tanstack/react-query";
 import MQTTComponents from "./MqttClan";
-
+import { toast } from 'react-hot-toast';
 
 function Header() {
   const navigate = useNavigate();
@@ -129,7 +129,31 @@ const raw = notiData?.data?.data?.data;
               </span>
 
               <div className="relative" ref={notiRef}>
-                <MQTTComponents/>
+                <MQTTComponents
+  onMessageCallback={(parsed) => {
+    const { type, fromUser, postTitle, content } = parsed;
+    console.log("fromUser", fromUser);
+    console.log("📥 Notifications raw data:", raw);
+
+    let message = "";
+    if (type === "like") {
+      message = `❤️ ${fromUser} đã thích bài viết "${postTitle}"`;
+    } else if (type === "comment") {
+      message = `💬 ${fromUser} đã bình luận: "${content}" trên bài viết "${postTitle}"`;
+    } else if (type === "reply") {
+      message = `↩️ ${fromUser} đã phản hồi: "${content}" trong bài viết "${postTitle}"`;
+    } else {
+      message = `🔔 Bạn có thông báo mới từ ${fromUser}`;
+    }
+
+    // Hiển thị thông báo dạng toast
+    toast(message);
+
+    // Gọi refetch lại dữ liệu notification
+    refetch();
+  }}
+/>
+
                 <Bell
                   onClick={() => setShowNoti((prev) => !prev)}
                   className="cursor-pointer text-gray-600 hover:text-blue-600"
@@ -152,17 +176,24 @@ const raw = notiData?.data?.data?.data;
                     ) : (
                       <ul className="max-h-64 overflow-y-auto divide-y">
                         {notifications.map((noti) => (
-                          <li
-                            key={noti.id}
-                            onClick={() => handleRead(noti.id)}
-                            className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
-                              noti.isRead ? "text-gray-500" : "font-semibold text-black"
-                            }`}
-                          >
-                            <div>{noti.title}</div>
-                            <div className="text-sm">{noti.content}</div>
-                          </li>
-                        ))}
+  <li
+    key={noti.id}
+    onClick={() => handleRead(noti.id)}
+    className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+      noti.isRead ? "text-gray-500" : "font-semibold text-black"
+    }`}
+  >
+    <div>
+      <span className="text-blue-600">
+        {noti?.user?.username || noti?.userName || "Người lạ"}
+      </span>{" "}
+      {noti.title}
+    </div>
+
+    <div className="text-sm">{noti.content}</div>
+  </li>
+))}
+
                       </ul>
                     )}
                   </div>
