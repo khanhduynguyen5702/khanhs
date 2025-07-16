@@ -356,8 +356,14 @@ const Home = () => {
                 {likedPosts[post.id] ? '❤️ Đã thích' : '🤍 Thích'}
               </button>
             </div>
-
+                  
             <div className="mt-4">
+               <NavLink to="/userin4" className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-lg transition">
+                  <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                    {post.user?.username?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div className="text-gray-800 font-semibold">{username || 'Ẩn danh'}</div>
+                </NavLink>
               <input
                 type="text"
                 placeholder="Viết bình luận..."
@@ -365,6 +371,7 @@ const Home = () => {
                 value={commentPosts[post.id] || ''}
                 onChange={(e) => setCommentPosts(prev => ({ ...prev, [post.id]: e.target.value }))}
               />
+              
               <button
                 onClick={() => handleCommentPosts(post.id)}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1 rounded"

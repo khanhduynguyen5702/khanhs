@@ -10,6 +10,8 @@ import axios from "axios";
 import {
   useQuery, useMutation, useQueryClient
 } from "@tanstack/react-query";
+import MQTTComponents from "./MqttClan";
+
 
 function Header() {
   const navigate = useNavigate();
@@ -127,6 +129,7 @@ const raw = notiData?.data?.data?.data;
               </span>
 
               <div className="relative" ref={notiRef}>
+                <MQTTComponents/>
                 <Bell
                   onClick={() => setShowNoti((prev) => !prev)}
                   className="cursor-pointer text-gray-600 hover:text-blue-600"
