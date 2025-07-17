@@ -13,7 +13,10 @@ function Header() {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
-
+  const handleLogout = () => {
+      logout();
+      navigate("/login");
+    };
   const API = axios.create({
     baseURL: "https://haicode.fcstoys.cloud/api",
     headers: {

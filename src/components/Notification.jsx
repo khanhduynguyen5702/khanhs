@@ -1,7 +1,6 @@
 import MQTTComponents from './MqttClan'
 import {toast} from 'react-hot-toast'
 import { useStore } from './Zustand'
-import { NavLink, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import {
@@ -10,11 +9,12 @@ import {
 import { Bell } from "lucide-react";
 
  function Notification () {
-  const navigate = useNavigate();
-  const { isLoggedIn, username, logout, role, triggerRefetchNoti, setTriggerRefetchNoti } = useStore();
+  
+  const {triggerRefetchNoti, setTriggerRefetchNoti } = useStore();
 
   const [showNoti, setShowNoti] = useState(false);
   const notiRef  = useRef (null);
+ 
 
   const queryClient = useQueryClient();
 
@@ -56,23 +56,17 @@ import { Bell } from "lucide-react";
 
   const handleRead = (id) => readOneMutation.mutate(id);
   const handleReadAll = () => readAllMutation.mutate();
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  
 
    useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-      if (notiRef.current && !notiRef.current.contains(event.target)) {
-        setShowNoti(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const handler = (e) => {
+    if (notiRef.current && !notiRef.current.contains(e.target)) {
+      setShowNoti(false);
+    }
+  };
+  document.addEventListener("mousedown", handler);
+  return () => document.removeEventListener("mousedown", handler);
+}, []);
 
   useEffect(() => {
     if (triggerRefetchNoti) {
@@ -118,6 +112,12 @@ import { Bell } from "lucide-react";
                   onClick={() => setShowNoti((prev) => !prev)}
                   className="cursor-pointer text-gray-600 hover:text-blue-600"
                 />
+
+                {notifications.filter(n => !n.isRead).length > 0 &&  (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full"> 
+                    {notifications.filter(n => !n.isRead).length}
+                  </span>
+                )}
                 {showNoti && (
                   <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg border rounded-lg z-50">
                     <div className="flex justify-between items-center px-4 py-2 border-b">
@@ -161,4 +161,4 @@ import { Bell } from "lucide-react";
   )
 }
 
-export default Notification
+export default Notification;
