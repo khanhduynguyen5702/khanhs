@@ -389,7 +389,7 @@ const Home = () => {
                           <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
                             {username?.charAt(0).toUpperCase() || 'U'}
                           </div>
-                          <div className="text-gray-800 font-semibold">{username }</div>
+                          <div className="text-gray-800 font-semibold">{cmt?.user?.username  }</div>
                         </NavLink>
                         <div className="text-xs text-gray-500">{formatDate(cmt.createdAt)}</div>
                       </div>
@@ -441,7 +441,7 @@ const Home = () => {
                                 <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
                                   {username?.charAt(0).toUpperCase() || 'U'}
                                 </div>
-                                <div className="text-gray-800 font-semibold">{username }</div>
+                                <div className="text-gray-800 font-semibold">{replyCmt.user?.username }</div>
                               </NavLink>                             
                               <div className="ml-1 mt-1">{reply.content}</div>
                               <div className="text-gray-500 text-right text-xs mt-1">{formatDate(reply.createdAt)}</div>
